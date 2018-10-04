@@ -13,3 +13,4 @@ ext_net_name: {external network name}
 #flavor_metadata:
 #  hw:cpu_policy: dedicated
 #  hw:cpu_thread_policy: isolate
+#overlay_mtu:

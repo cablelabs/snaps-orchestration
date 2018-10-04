@@ -13,4 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ---
-- include: playbooks/sample-playbook.yml
+- hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+  - name: Create MOTD
+    action: template owner=root group=root mode=666 src=../files/motd.j2 dest=/etc/motd

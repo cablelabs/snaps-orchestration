@@ -12,6 +12,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# This snaps template will create a new user and project under which a single
+# VM will be spawned with a floating IP and an Ansible Playbook will be
+# executed setting the MOTD to output the data
 ---
 openstack:
   connections:
@@ -57,8 +61,8 @@ openstack:
   - image:
       os_creds_name: admin-creds
       name: snaps-simple-ubuntu
-      public: True
       format: qcow2
+      public: True
       image_user: ubuntu
       download_url: https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
   networks:
@@ -73,6 +77,7 @@ openstack:
       subnets:
       - subnet:
           name: simple-subnet
+          project_name: snaps-simple
           cidr: 10.0.1.0/24
           dns_nameservers: [8.8.8.8]
   routers:
@@ -95,6 +100,24 @@ openstack:
       name: simple-kp
       public_filepath: /tmp/simple-kp.pub
       private_filepath: /tmp/simple-kp
+      delete_on_clean: True
+  security_groups:
+  - security_group:
+      os_user:
+        name: snaps-simple-user
+        project_name: snaps-simple
+      name: snaps-simple-sg
+      rules:
+        - direction: ingress
+          protocol: icmp
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - direction: egress
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
   instances:
   - instance:
       os_user:
@@ -104,6 +127,8 @@ openstack:
       flavor: simple-flavor
       imageName: snaps-simple-ubuntu
       keypair_name: simple-kp
+      security_group_names:
+      - snaps-simple-sg
       userdata: |
         #cloud-config
         packages:
@@ -115,12 +140,13 @@ openstack:
       - port:
           name: simple-net-port
           network_name: simple-net
+          ip_addrs:
+          - subnet_name: simple-subnet
       floating_ips:
       - floating_ip:
           name: fip1
           port_name: simple-net-port
           router_name: simple-router
-          subnet_name: simple-subnet
 ansible:
   - playbook_location: main.yml
     hosts:
