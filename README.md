@@ -1,12 +1,17 @@
 # snaps-orchestration
 
-snaps-orchestration contains Python clients for provisioning cloud
-services. Currently OpenStack is supported.
+This is a lightweight orchestrator for OpenStack that allows one to
+create objects, create complex virtual environments, and execute Ansible
+Playbooks against virtual machines.
 
 ## Getting started
 
 ```Bash
 git clone https://github.com/cablelabs/snaps-orchestration.git
+
+# Cleanup Python runtime
+pip uninstall -y snaps-orchestration; pip freeze | xargs pip uninstall -y
+pip install -r snaps-orchestration/requirements.txt
 pip install -e snaps-orchestration/
 ```
 
@@ -17,10 +22,11 @@ Help](https://help.github.com/) is also outstanding.
 ## Executing Orchestration for OpenStack
 
 ```Bash
-python {repo_dir}/openstack-launch.py -t {path to snaps template} -e {path to optional environment file for J2} [-d (for deploy)| -c (for cleanup)
+python {repo_dir}/snaps-orchestration/openstack-launch.py -t {path to snaps template} -e {path to optional environment file for J2} [-d (for deploy)| -c (for cleanup)
 ```
 
-Please see the docs/examples/openstack directory for example SNAPS OpenStack orchestration templates
+**Please see the [Quickstart](docs/quickstart.md) to get you started with a concrete example on deploying a simple scenario**
+**Also see the [Configuration Guide](docs/orchestrator-config.md) for assistance on creating your own deployment**
 
 ## Contributing
 

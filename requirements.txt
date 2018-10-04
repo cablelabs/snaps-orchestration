@@ -1,6 +1,6 @@
 mock
 PyYAML
 jinja2
-git+git://github.com/cablelabs/snaps-common@master#egg=snaps-common
-git+git://gerrit.opnfv.org/gerrit/snaps@master#egg=snaps
+git+https://github.com/cablelabs/snaps-common@master#egg=snaps-common
+git+https://gerrit.opnfv.org/gerrit/snaps@master#egg=snaps
 keystoneauth1
