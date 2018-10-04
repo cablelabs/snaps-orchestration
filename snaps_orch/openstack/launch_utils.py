@@ -53,7 +53,7 @@ from snaps.openstack.utils.nova_utils import RebootType
 from snaps_common.ansible_snaps import ansible_utils
 from snaps_common.file import file_utils
 
-logger = logging.getLogger('lanuch_utils')
+logger = logging.getLogger('launch_utils')
 DEFAULT_CREDS_KEY = 'admin'
 
 
