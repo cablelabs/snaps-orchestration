@@ -1,0 +1,15 @@
+# Required
+admin_user: admin
+admin_proj: admin
+admin_pass: {password}
+auth_url: http://{ip}:5000
+ext_net_name: {external network name}
+
+# Optional
+#id_api_version: (default 3)
+#proxy_host:
+#proxy_port:
+#ssh_proxy_cmd:
+#flavor_metadata:
+#  hw:cpu_policy: dedicated
+#  hw:cpu_thread_policy: isolate

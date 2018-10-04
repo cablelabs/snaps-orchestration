@@ -1,0 +1,6 @@
+mock
+keystoneauth1
+PyYAML
+jinja2
+git+git://github.com/cablelabs/snaps-common#egg=snaps-common
+git+https://gerrit.opnfv.org/gerrit/snaps#egg=snaps
