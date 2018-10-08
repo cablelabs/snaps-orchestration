@@ -1,0 +1,153 @@
+# Copyright (c) 2016 Cable Television Laboratories, Inc. ("CableLabs")
+#                    and others.  All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at:
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# This snaps template will create a VM with a volume attached
+---
+openstack:
+  connections:
+  - connection:
+      name: admin-creds
+      username: admin
+      project_name: admin
+      password: {{ admin_pass }}
+      auth_url: {{ auth_url }}
+      identity_api_version: {{ id_api_version | default(3) }}
+      proxy_settings:
+        host: {{ proxy_host | default('') }}
+        port: {{ proxy_port | default('') }}
+        ssh_proxy_cmd: {{ ssh_proxy_cmd | default('') }}
+  projects:
+  - project:
+      os_creds_name: admin-creds
+      name: snaps-volume
+      description: Volume snaps openstack orch template example
+      users: [snaps-volume-user, admin]
+  users:
+  - user:
+      os_creds_name: admin-creds
+      name: snaps-volume-user
+      password: password
+      project_name: snaps-volume
+      roles:
+        admin: snaps-volume
+  flavors:
+  - flavor:
+      os_creds_name: admin-creds
+      name: snaps-volume-flavor
+      ram: 2048
+      disk: 20
+      vcpus: 1
+{% if flavor_metadata is defined %}
+      metadata:
+      {% for key, value in flavor_metadata.iteritems() %}
+        {{ key }}: {{ value }}
+      {% endfor %}
+{% endif %}
+  qos_specs:
+  - qos_spec:
+      os_creds_name: admin-creds
+      name: snaps-volume-qos
+      consumer: both
+  volume_types:
+  - volume_type:
+      os_creds_name: admin-creds
+      name: snaps-volume-type
+      encryption:
+        name: snaps-volume-encryption
+        provider_class: LuksEncryptor
+        control_location: front-end
+  volumes:
+  - volume:
+      os_user:
+        name: snaps-volume-user
+        project_name: snaps-volume
+      name: snaps-volume-1
+      size: 10
+  images:
+  - image:
+      os_creds_name: admin-creds
+      name: snaps-volume-ubuntu
+      format: qcow2
+      public: True
+      image_user: ubuntu
+      download_url: https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
+  networks:
+  - network:
+      os_user:
+        name: snaps-volume-user
+        project_name: snaps-volume
+      name: snaps-volume-net
+      project_name: snaps-volume
+      subnets:
+      - subnet:
+          name: snaps-volume-subnet
+          project_name: snaps-volume
+          cidr: 10.0.1.0/24
+          dns_nameservers: [8.8.8.8]
+  routers:
+  - router:
+      os_user:
+        name: snaps-volume-user
+        project_name: snaps-volume
+      name: snaps-volume-router
+      external_gateway: {{ ext_net_name }}
+      internal_subnets:
+      - subnet:
+          project_name: snaps-volume
+          network_name: snaps-volume-net
+          subnet_name: snaps-volume-subnet
+  keypairs:
+  - keypair:
+      os_user:
+        name: snaps-volume-user
+        project_name: snaps-volume
+      name: snaps-volume-kp
+      public_filepath: /tmp/snaps-volume-kp.pub
+      private_filepath: /tmp/snaps-volume-kp
+      delete_on_clean: True
+  security_groups:
+  - security_group:
+      os_user:
+        name: snaps-volume-user
+        project_name: snaps-volume
+      name: snaps-volume-sg
+      rules:
+      - direction: ingress
+        protocol: icmp
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+  instances:
+  - instance:
+      os_user:
+        name: snaps-volume-user
+        project_name: snaps-volume
+      name: snaps-volume-inst-1
+      flavor: snaps-volume-flavor
+      imageName: snaps-volume-ubuntu
+      keypair_name: snaps-volume-kp
+      security_group_names: [snaps-volume-sg]
+      volume_names:
+      - snaps-volume-1
+      ports:
+      - port:
+          name: snaps-volume-inst-1-1
+          network_name: snaps-volume-net
+      floating_ips:
+      - floating_ip:
+          name: fip1
+          port_name: snaps-volume-inst-1-1
+          router_name: snaps-volume-router
