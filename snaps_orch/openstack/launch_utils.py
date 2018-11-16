@@ -549,7 +549,7 @@ def __get_variables(var_config, os_creds_dict, vm_dict, image_dict,
             value = __get_variable_value(
                 value, os_creds_dict, vm_dict, image_dict, flavor_dict,
                 networks_dict, routers_dict)
-            if key and value:
+            if key and value is not None:
                 variables[key] = value
                 logger.info(
                     "Set Jinga2 variable with key [%s] the value [%s]",
