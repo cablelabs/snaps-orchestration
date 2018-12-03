@@ -42,14 +42,21 @@ def __run(arguments):
 
     logger.info('Starting to Deploy')
 
+    extra_vars = __parse_ev(arguments.extra_vars)
+    if extra_vars:
+        ev_env = Environment(loader=FileSystemLoader(
+            searchpath=os.path.dirname(arguments.env_file)))
+        ev_tmplt = ev_env.get_template(os.path.basename(arguments.env_file))
+        env_str = ev_tmplt.render(**extra_vars)
+        env_dict = yaml.load(env_str)
+        env_dict.update(extra_vars)
+    else:
+        env_dict = file_utils.read_yaml(arguments.env_file)
+
     # Apply env_file/substitution file to template
     env = Environment(loader=FileSystemLoader(
         searchpath=os.path.dirname(arguments.tmplt_file)))
     template = env.get_template(os.path.basename(arguments.tmplt_file))
-
-    env_dict = dict()
-    if arguments.env_file:
-        env_dict = file_utils.read_yaml(arguments.env_file)
     output = template.render(**env_dict)
 
     config = yaml.load(output)
@@ -66,6 +73,16 @@ def __run(arguments):
         exit(1)
 
     exit(0)
+
+
+def __parse_ev(extra_vars):
+    out = dict()
+    if extra_vars and isinstance(extra_vars, list):
+        for extra_var in extra_vars:
+            var_toks = extra_var.split('=')
+            if len(var_toks) == 2:
+                out[var_toks[0]] = var_toks[1]
+    return out
 
 
 if __name__ == '__main__':
@@ -90,6 +107,9 @@ if __name__ == '__main__':
     parser.add_argument(
         '-e', '--env-file', dest='env_file',
         help='Yaml file containing substitution values to the env file')
+    parser.add_argument(
+        '-v', '--extra-vars', dest='extra_vars', nargs='*',
+        help='List of k/v pairs separated by =')
     parser.add_argument(
         '-l', '--log-level', dest='log_level', default='INFO',
         help='Logging Level (INFO|DEBUG)')
