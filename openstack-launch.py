@@ -21,7 +21,6 @@ from jinja2 import Environment, FileSystemLoader
 import os
 import yaml
 
-from snaps_common.file import file_utils
 from snaps_orch.openstack import launch_utils
 
 __author__ = 'spisarski'
@@ -43,17 +42,14 @@ def __run(arguments):
     logger.info('Starting to Deploy')
 
     extra_vars = __parse_ev(arguments.extra_vars)
-    if extra_vars:
-        ev_env = Environment(loader=FileSystemLoader(
-            searchpath=os.path.dirname(arguments.env_file)))
-        ev_tmplt = ev_env.get_template(os.path.basename(arguments.env_file))
-        env_str = ev_tmplt.render(**extra_vars)
-        env_dict = yaml.load(env_str)
-        env_dict.update(extra_vars)
-    else:
-        env_dict = file_utils.read_yaml(arguments.env_file)
+    ev_env = Environment(loader=FileSystemLoader(
+        searchpath=os.path.dirname(arguments.env_file)))
+    ev_tmplt = ev_env.get_template(os.path.basename(arguments.env_file))
+    env_str = ev_tmplt.render(**extra_vars)
+    env_dict = yaml.load(env_str)
+    env_dict.update(extra_vars)
 
-    # Apply env_file/substitution file to template
+    # Apply env_file and extra_vars file to template
     env = Environment(loader=FileSystemLoader(
         searchpath=os.path.dirname(arguments.tmplt_file)))
     template = env.get_template(os.path.basename(arguments.tmplt_file))
