@@ -11,7 +11,7 @@ git clone https://github.com/cablelabs/snaps-orchestration.git
 
 # Cleanup Python runtime
 pip uninstall -y snaps-orchestration; pip freeze | xargs pip uninstall -y
-pip install -r snaps-orchestration/requirements.txt
+pip install -r snaps-orchestration/requirements-git.txt
 pip install -e snaps-orchestration/
 ```
 
@@ -22,7 +22,7 @@ Help](https://help.github.com/) is also outstanding.
 ## Executing Orchestration for OpenStack
 
 ```Bash
-python {repo_dir}/snaps-orchestration/openstack-launch.py -t {path to snaps template} -e {path to optional environment file for J2} [-d (for deploy)| -c (for cleanup)
+python {repo_dir}/snaps-orchestration/openstack-launch.py -t {path to snaps template} -e {path to optional environment file for J2} [-d "for deploy"| -c "for cleanup"]
 ```
 
 **Please see the [Quickstart](docs/quickstart.md) to get you started with a concrete example on deploying a simple scenario**

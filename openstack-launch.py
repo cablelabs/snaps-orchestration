@@ -41,6 +41,7 @@ def __run(arguments):
 
     logger.info('Starting to Deploy')
 
+    # Setup J2 Template variables
     extra_vars = __parse_ev(arguments.extra_vars)
     ev_env = Environment(loader=FileSystemLoader(
         searchpath=os.path.dirname(arguments.env_file)))
@@ -61,8 +62,7 @@ def __run(arguments):
         clean = arguments.clean is not ARG_NOT_SET
         clean_image = arguments.clean_image is not ARG_NOT_SET
         deploy = arguments.deploy is not ARG_NOT_SET
-        launch_utils.launch_config(
-            config, arguments.tmplt_file, deploy, clean, clean_image)
+        launch_utils.launch_config(config, deploy, clean, clean_image)
     else:
         logger.error(
             'Unable to read configuration file - ' + arguments.tmplt_file)

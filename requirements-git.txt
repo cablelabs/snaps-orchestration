@@ -1,0 +1,2 @@
+git+https://github.com/cablelabs/snaps-common@master#egg=snaps-common
+git+https://gerrit.opnfv.org/gerrit/snaps@master#egg=snaps-oo
