@@ -54,4 +54,4 @@ class LaunchUtilsTests(unittest.TestCase):
         # self.assertIsNotNone(m1)
         # self.assertIsNotNone(m2)
         launch_utils.launch_config(
-            self.pb_dict, self.pb_loc, True, False, False)
+            self.pb_dict, True, False, False)

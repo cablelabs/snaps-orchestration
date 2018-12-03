@@ -20,7 +20,6 @@ import re
 import socket
 import struct
 
-import os
 import time
 from keystoneauth1.exceptions import Unauthorized
 
@@ -57,11 +56,10 @@ logger = logging.getLogger('launch_utils')
 DEFAULT_CREDS_KEY = 'admin'
 
 
-def launch_config(config, tmplt_file, deploy, clean, clean_image):
+def launch_config(config, deploy, clean, clean_image):
     """
     Launches all objects and applies any configured ansible playbooks
     :param config: the environment configuration dict object
-    :param tmplt_file: the path to the SNAPS-OO template file
     :param deploy: when True deploy
     :param clean: when True clean
     :param clean_image: when True clean the image when clean is True
@@ -175,7 +173,7 @@ def launch_config(config, tmplt_file, deploy, clean, clean_image):
         if ansible_config and vm_dict:
             if not __apply_ansible_playbooks(
                     ansible_config, os_creds_dict, vm_dict, images_dict,
-                    flavors_dict, networks_dict, routers_dict, tmplt_file):
+                    flavors_dict, networks_dict, routers_dict):
                 logger.error("Problem applying ansible playbooks")
 
 
@@ -378,7 +376,7 @@ def __create_vm_instances(os_creds_dict, os_users_dict, instances_config,
 
 def __apply_ansible_playbooks(ansible_configs, os_creds_dict, vm_dict,
                               image_dict, flavor_dict, networks_dict,
-                              routers_dict, tmplt_file):
+                              routers_dict):
     """
     Applies ansible playbooks to running VMs with floating IPs
     :param ansible_configs: a list of Ansible configurations
@@ -394,19 +392,10 @@ def __apply_ansible_playbooks(ansible_configs, os_creds_dict, vm_dict,
                           the name is the key
     :param routers_dict: the dictionary of newly instantiated routers where
                           the name is the key
-    :param tmplt_file: the path of the SNAPS-OO template file for setting the
-                       CWD so playbook location is relative to the deployment
-                       file
     :return: t/f - true if successful
     """
     logger.info("Applying Ansible Playbooks")
     if ansible_configs:
-        # Set CWD so the deployment file's playbook location can leverage
-        # relative paths
-        orig_cwd = os.getcwd()
-        env_dir = os.path.dirname(tmplt_file)
-        os.chdir(env_dir)
-
         # Apply playbooks
         for ansible_config in ansible_configs:
             # Ensure all hosts are accepting SSH session requests
@@ -422,10 +411,6 @@ def __apply_ansible_playbooks(ansible_configs, os_creds_dict, vm_dict,
             __apply_ansible_playbook(
                 ansible_config, os_creds_dict, vm_dict, image_dict,
                 flavor_dict, networks_dict, routers_dict)
-
-        # Return to original directory
-        os.chdir(orig_cwd)
-
     return True
 
 
