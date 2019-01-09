@@ -50,6 +50,9 @@ def __run(arguments):
     env_dict = yaml.load(env_str)
     env_dict.update(extra_vars)
 
+    logger.info('Starting deployment of file [%s] with environment %s',
+                arguments.tmplt_file, env_dict)
+
     # Apply env_file and extra_vars file to template
     env = Environment(loader=FileSystemLoader(
         searchpath=os.path.dirname(arguments.tmplt_file)))
